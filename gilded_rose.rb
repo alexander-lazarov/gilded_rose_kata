@@ -1,6 +1,7 @@
 BACKSTAGE_PASSES = 'Backstage passes to a TAFKAL80ETC concert'.freeze
 AGED_BRIE = 'Aged Brie'.freeze
 SULFURAS =  'Sulfuras, Hand of Ragnaros'.freeze
+CONJURED = 'Conjured Mana Cake'.freeze
 
 def update_quality(items)
   items.each do |item|
@@ -43,6 +44,8 @@ def advance_quality!(item)
     item.quality += passed_date?(item) ? 2 : 1
   when SULFURAS
     item.quality = item.quality
+  when CONJURED
+    item.quality -= passed_date?(item) ? 4 : 2
   else
     item.quality -= passed_date?(item) ? 2 : 1
   end
