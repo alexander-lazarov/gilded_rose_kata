@@ -4,41 +4,9 @@ SULFURAS =  'Sulfuras, Hand of Ragnaros'.freeze
 
 def update_quality(items)
   items.each do |item|
-    if item.name != AGED_BRIE && item.name != BACKSTAGE_PASSES
-      if item.quality > 0
-        if item.name != SULFURAS
-          item.quality -= 1
-        end
-      end
-    else
-      item.quality += 1
-      if item.name == BACKSTAGE_PASSES
-        if item.sell_in < 11
-          item.quality += 1
-        end
-        if item.sell_in < 6
-          item.quality += 1
-        end
-      end
-    end
+    decrease_days!(item)
 
-    decrease_days(item)
-
-    if item.sell_in < 0
-      if item.name != AGED_BRIE
-        if item.name != BACKSTAGE_PASSES
-          if item.quality > 0
-            if item.name != SULFURAS
-              item.quality -= 1
-            end
-          end
-        else
-          item.quality = 0
-        end
-      else
-        item.quality += 1
-      end
-    end
+    advance_quality!(item)
 
     lower_bound_quality!(item)
     upper_bound_quality!(item)
@@ -55,8 +23,33 @@ def upper_bound_quality!(item)
   item.quality = max_quality if item.quality > max_quality
 end
 
-def decrease_days(item)
+def decrease_days!(item)
   item.sell_in -= 1 unless item.name == SULFURAS
+end
+
+def advance_quality!(item)
+  case item.name
+  when BACKSTAGE_PASSES
+    if item.sell_in < 0
+      item.quality = 0
+    elsif item.sell_in < 5
+      item.quality += 3
+    elsif item.sell_in < 10
+      item.quality += 2
+    else
+      item.quality += 1
+    end
+  when AGED_BRIE
+    item.quality += passed_date?(item) ? 2 : 1
+  when SULFURAS
+    item.quality = item.quality
+  else
+    item.quality -= passed_date?(item) ? 2 : 1
+  end
+end
+
+def passed_date?(item)
+  item.sell_in < 0
 end
 
 # DO NOT CHANGE THINGS BELOW -----------------------------------------
