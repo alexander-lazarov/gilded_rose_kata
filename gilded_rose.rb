@@ -11,25 +11,19 @@ def update_quality(items)
         end
       end
     else
-      if item.quality < 50
-        item.quality += 1
-        if item.name == BACKSTAGE_PASSES
-          if item.sell_in < 11
-            if item.quality < 50
-              item.quality += 1
-            end
-          end
-          if item.sell_in < 6
-            if item.quality < 50
-              item.quality += 1
-            end
-          end
+      item.quality += 1
+      if item.name == BACKSTAGE_PASSES
+        if item.sell_in < 11
+          item.quality += 1
+        end
+        if item.sell_in < 6
+          item.quality += 1
         end
       end
     end
-    if item.name != SULFURAS
-      item.sell_in -= 1
-    end
+
+    decrease_days(item)
+
     if item.sell_in < 0
       if item.name != AGED_BRIE
         if item.name != BACKSTAGE_PASSES
@@ -39,15 +33,30 @@ def update_quality(items)
             end
           end
         else
-          item.quality = item.quality - item.quality
+          item.quality = 0
         end
       else
-        if item.quality < 50
-          item.quality += 1
-        end
+        item.quality += 1
       end
     end
+
+    lower_bound_quality!(item)
+    upper_bound_quality!(item)
   end
+end
+
+def lower_bound_quality!(item)
+  item.quality = 0 if item.quality < 0
+end
+
+def upper_bound_quality!(item)
+  max_quality = item.name == SULFURAS ? 80 : 50
+
+  item.quality = max_quality if item.quality > max_quality
+end
+
+def decrease_days(item)
+  item.sell_in -= 1 unless item.name == SULFURAS
 end
 
 # DO NOT CHANGE THINGS BELOW -----------------------------------------
